@@ -9,3 +9,6 @@ target/
 .settings/
 .project
 .classpath
+
+# Netbeans
+nbactions.xml
