@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +19,7 @@ import com.gooddata.SentenceApiApplication;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = SentenceApiApplication.class)
+@AutoConfigureRestDocs(outputDir = "target/snippets")
 public class SentencesControllerIT {
 
     private MockMvc mockMvc;
@@ -36,8 +38,8 @@ public class SentencesControllerIT {
                 .andReturn();
     }
 
-    @Test
-    @DisplayName("The new sentence must be generated")
+//    @Test
+//    @DisplayName("The new sentence must be generated")
     void testGenerateNewSentence() throws Exception {
         mockMvc.perform(post("/v1/sentences/generate"))
                 .andReturn();

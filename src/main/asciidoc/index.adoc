@@ -1,0 +1,9 @@
+= Sentence generation API
+
+This application is REST web service for generation sentences.
+
+.request
+include::{snippets}/words/http-request.adoc[]
+
+.response
+include::{snippets}/words/http-response.adoc[]

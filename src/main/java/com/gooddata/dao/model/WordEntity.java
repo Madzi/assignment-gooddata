@@ -26,6 +26,14 @@ public class WordEntity implements Word, Serializable {
     @Column(name = "category", nullable = false)
     private Category category;
 
+    public WordEntity() {
+    }
+
+    public WordEntity(final Word word) {
+        this.name = word.getName();
+        this.category = word.getCategory();
+    }
+
     public Long getId() {
         return id;
     }
@@ -50,6 +58,25 @@ public class WordEntity implements Word, Serializable {
 
     public void setCategory(final Category category) {
         this.category = category;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Word)) {
+            return false;
+        }
+        var word = (Word) other;
+        return category == word.getCategory() && name.equals(word.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * name.hashCode() + category.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Word(" + id + ", " + name + ", " + category + ")";
     }
 
 }

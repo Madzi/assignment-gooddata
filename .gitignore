@@ -9,6 +9,7 @@ target/
 .settings/
 .project
 .classpath
+.springBeans
 
 # Netbeans
 nbactions.xml

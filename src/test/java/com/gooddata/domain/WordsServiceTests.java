@@ -1,6 +1,7 @@
 package com.gooddata.domain;
 
-import com.gooddata.domain.impl.InMemWordsServiceImpl;
+import com.gooddata.dao.WordsRepository;
+import com.gooddata.domain.impl.WordsServiceImpl;
 import com.gooddata.domain.model.Category;
 import com.gooddata.domain.model.TestWord;
 import org.junit.jupiter.api.Assertions;
@@ -8,13 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ContextConfiguration(classes = { InMemWordsServiceImpl.class })
 public class WordsServiceTests {
 
     @Autowired
@@ -45,11 +46,14 @@ public class WordsServiceTests {
     void testAddAndGetWord() {
         // Given
         var expectedResult = new TestWord("new-word-test", Category.ADJECTIVE);
-
-        // When
         wordsService.addWord(expectedResult);
 
+        // When
+        var actualResult = wordsService.getWordsForName("new-word-test");
+
         // Then
+        Assertions.assertTrue(actualResult.size() == 1);
+        Assertions.assertTrue(actualResult.contains(expectedResult));
     }
 
 }
