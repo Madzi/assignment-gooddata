@@ -5,7 +5,7 @@ package com.gooddata.domain.model;
  */
 public interface Sentence {
 
-    String getId();
+    Long getId();
     Word getNoun();
     Word getVerb();
     Word getAdjective();

@@ -3,9 +3,12 @@ package com.gooddata.dao.model;
 import com.gooddata.domain.model.Sentence;
 import com.gooddata.domain.model.Word;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -17,8 +20,8 @@ public class SentenceEntity implements Sentence, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "id", nullable = false)
-    private String id;
+    @GeneratedValue
+    private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private WordEntity noun;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,11 +33,23 @@ public class SentenceEntity implements Sentence, Serializable {
     @Column(name = "show_count", nullable = false)
     private Long showCount;
 
+    public SentenceEntity() {
+        timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        showCount = 0L;
+    }
+
+    public SentenceEntity(final WordEntity noun, final WordEntity verb, final WordEntity adjective) {
+        this();
+        this.noun = noun;
+        this.verb = verb;
+        this.adjective = adjective;
+    }
+
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(final String id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -81,6 +96,25 @@ public class SentenceEntity implements Sentence, Serializable {
 
     public void setShowCount(final Long showCount) {
         this.showCount = showCount;
+    }
+
+    @Override
+    public String toString() {
+        return "Sentence(" + noun.toString() + " - " + verb.toString() + " - " + adjective.toString() + ", timestamp: " + timestamp + ", showCount" + showCount + ")";
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof Sentence)) {
+            return false;
+        }
+        Sentence sentence = (Sentence) other;
+        return noun.equals(sentence.getNoun()) && verb.equals(sentence.getVerb()) && adjective.equals(sentence.getAdjective());
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * (31 * noun.hashCode() + verb.hashCode()) + adjective.hashCode();
     }
 
 }

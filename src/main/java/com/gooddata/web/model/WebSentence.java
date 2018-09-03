@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class WebSentence implements Serializable {
 
-    private String id;
+    private Long id;
     private String text;
     private long showDisplayCount;
     private long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
@@ -16,7 +16,7 @@ public class WebSentence implements Serializable {
     public WebSentence() {
     }
 
-    public WebSentence(final String id, final String text, final long showDisplayCount, final long timestamp) {
+    public WebSentence(final Long id, final String text, final long showDisplayCount, final long timestamp) {
         this.id = id;
         this.text = text;
         this.showDisplayCount = showDisplayCount;
@@ -29,17 +29,17 @@ public class WebSentence implements Serializable {
 
     public WebSentence(final Sentence sentence, final boolean yoda) {
         id = sentence.getId();
-        text = yoda ? sentence.getNoun().getName() + ' ' + sentence.getVerb().getName() + ' ' + sentence.getAdjective().getName()
-                    : sentence.getAdjective().getName() + ' ' + sentence.getNoun().getName() + ' ' + sentence.getVerb().getName();
+        text = yoda ? sentence.getAdjective().getName() + ' ' + sentence.getNoun().getName() + ' ' + sentence.getVerb().getName()
+                    : sentence.getNoun().getName() + ' ' + sentence.getVerb().getName() + ' ' + sentence.getAdjective().getName();
         timestamp = sentence.getTimestamp();
         showDisplayCount = sentence.getShowCount();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final String id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
