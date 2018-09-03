@@ -5,6 +5,7 @@ import com.gooddata.dao.model.WordEntity;
 import com.gooddata.domain.WordsService;
 import com.gooddata.domain.model.Category;
 import com.gooddata.domain.model.Word;
+import com.gooddata.infra.ApiValidationException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -16,6 +17,7 @@ public class WordsServiceImpl implements WordsService {
 
     @Autowired
     private WordsRepository wordsRepository;
+
     private Random random = new Random();
 
     @Override
@@ -25,6 +27,9 @@ public class WordsServiceImpl implements WordsService {
 
     @Override
     public void addWord(final Word word) {
+        if (word.getCategory() == null) {
+            throw new ApiValidationException("Unknown word category");
+        }
         var entity = new WordEntity(word);
         wordsRepository.save(entity);
     }
@@ -35,10 +40,10 @@ public class WordsServiceImpl implements WordsService {
     }
 
     @Override
-    public Word randomWordByCategory(final Category category) throws IllegalStateException {
+    public Word randomWordByCategory(final Category category) {
         var suitableWords = wordsRepository.findByCategory(category);
         if (suitableWords.isEmpty()) {
-            throw new IllegalStateException("No words into category: " + category.name());
+            throw new ApiValidationException("No words into category: " + category.name());
         }
         var index = suitableWords.size() == 1 ? 0 : random.nextInt() % suitableWords.size();
         return suitableWords.get(index);

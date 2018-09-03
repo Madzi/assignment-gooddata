@@ -38,6 +38,6 @@ public interface WordsService {
      * @return random word
      * @throws IllegalStateException when set of words for category is empty
      */
-    Word randomWordByCategory(Category category) throws IllegalStateException;
+    Word randomWordByCategory(Category category);
 
 }

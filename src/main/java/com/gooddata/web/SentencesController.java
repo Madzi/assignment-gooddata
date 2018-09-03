@@ -3,6 +3,7 @@ package com.gooddata.web;
 import com.gooddata.domain.SentencesService;
 import com.gooddata.web.model.WebSentence;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,23 +19,22 @@ public class SentencesController {
     @Autowired
     private SentencesService sentencesService;
 
-    @GetMapping("/v1/sentences")
+    @GetMapping("/sentences")
     public List<WebSentence> listAllSentences() {
-        var knownSentences = sentencesService.getAllSentences();
-        return null;
+        return sentencesService.getAllSentences().stream().map(WebSentence::new).collect(Collectors.toUnmodifiableList());
     }
 
-    @GetMapping("/v1/sentences/{sententceId}")
+    @GetMapping("/sentences/{sententceId}")
     public WebSentence getSentenceById(@PathVariable String sentenceId) {
         return sentencesService.getSentenceById(sentenceId).map(WebSentence::new).get();
     }
 
-    @GetMapping("/v1/sentences/{sentencesId}/yodaTalk")
+    @GetMapping("/sentences/{sentencesId}/yodaTalk")
     public WebSentence getYodaSentenceById(@PathVariable String sentenceId) {
         return sentencesService.getSentenceById(sentenceId).map(snt -> new WebSentence(snt, true)).get();
     }
 
-    @PostMapping("/v1/sentences/generate")
+    @PostMapping("/sentences/generate")
     public WebSentence generateSentence() {
         var sentence = sentencesService.generate();
         return new WebSentence(sentence);

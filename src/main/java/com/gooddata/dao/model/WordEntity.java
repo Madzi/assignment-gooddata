@@ -29,9 +29,13 @@ public class WordEntity implements Word, Serializable {
     public WordEntity() {
     }
 
+    public WordEntity(final String name, final Category category) {
+        this.name = name;
+        this.category = category;
+    }
+
     public WordEntity(final Word word) {
-        this.name = word.getName();
-        this.category = word.getCategory();
+        this(word.getName(), word.getCategory());
     }
 
     public Long getId() {
