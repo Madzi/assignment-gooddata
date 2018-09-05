@@ -2,21 +2,16 @@ package com.gooddata.domain.impl;
 
 import com.gooddata.dao.WordEntity;
 import com.gooddata.dao.WordsRepository;
+import com.gooddata.domain.WordsService;
+import com.gooddata.domain.model.Word;
 import com.gooddata.domain.model.WordCategory;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import java.util.ResourceBundle;
-import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.gooddata.domain.WordsService;
-import com.gooddata.domain.model.Word;
 
 @Service
 public class WordsServiceImpl implements WordsService {
