@@ -17,7 +17,7 @@ public class WordsControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ BadWordCategoryException.class, IllegalStateException.class, NoSuchElementException.class })
     @ResponseBody
     public ResponseEntity<ApiError> handleBadCategory(final Exception ex, final WebRequest request) {
-        return new ResponseEntity<ApiError>(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
 }
