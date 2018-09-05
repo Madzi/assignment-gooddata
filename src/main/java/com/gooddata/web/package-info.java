@@ -1,4 +1,4 @@
 /**
- * Package for web related stuff.
+ * Package for front layer.
  */
 package com.gooddata.web;

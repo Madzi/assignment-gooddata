@@ -1,22 +1,22 @@
 package com.gooddata.domain.model;
 
 /**
- * The abstract word.
+ * The word of sentence.
  */
 public interface Word {
 
     /**
-     * Returns name of word.
+     * Returns the word (name or mean).
      *
-     * @return the name
+     * @return the word
      */
-    String getName();
+    String getWord();
 
     /**
-     * Returns category of word.
+     * Returns the words category.
      *
-     * @return the category
+     * @return the words category
      */
-    Category getCategory();
+    WordCategory getWordCategory();
 
 }

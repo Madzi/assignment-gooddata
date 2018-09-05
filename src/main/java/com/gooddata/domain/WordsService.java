@@ -1,43 +1,54 @@
 package com.gooddata.domain;
 
-import com.gooddata.domain.model.Category;
-import com.gooddata.domain.model.Word;
 import java.util.List;
 
+import com.gooddata.domain.model.Word;
+import com.gooddata.domain.model.WordCategory;
+
 /**
- * Service for get/put words to system.
+ * Business layer for words.
  */
 public interface WordsService {
 
     /**
-     * Return all known words in system.
+     * Returns all known words.
      *
      * @return the list of words
      */
-    List<Word> getAllWords();
-
-    /**
-     * Add new word into system.
-     *
-     * @param word the word
-     */
-    void addWord(Word word);
+    List<Word> findAll();
 
     /**
      * Returns list of words with specified name.
+     * It can be a list because we can have different words with the same name
+     * e.g. Word(go:NOUN) (game) and Word(go:VERB) (moving)
      *
-     * @param name the name
-     * @return the list of words (possible empty)
+     * @param word the name of word
+     * @return the list of words
      */
-    List<Word> getWordsForName(String name);
+    List<Word> getByWord(String word);
+
+    /**
+     * Returns word which was added to list of known words.
+     *
+     * @param word the word
+     * @return the word
+     */
+    Word addWord(Word word);
+
+    /**
+     * Returns filtered list of incoming messages.
+     *
+     * @param category the category
+     * @return words for specified category
+     */
+    List<Word> getByCategory(WordCategory category);
 
     /**
      * Returns random word from known words for specified category.
      *
      * @param category the category
-     * @return random word
-     * @throws IllegalStateException when set of words for category is empty
+     * @return
      */
-    Word randomWordByCategory(Category category);
+    Word randomWordByCategory(WordCategory category);
 
 }

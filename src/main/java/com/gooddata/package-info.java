@@ -1,4 +1,4 @@
 /**
- * Package for application entry point (class with main function).
+ * Core package for application.
  */
 package com.gooddata;

@@ -1,4 +1,4 @@
 /**
- * Business logic and domain models.
+ * Package for business logic.
  */
 package com.gooddata.domain;

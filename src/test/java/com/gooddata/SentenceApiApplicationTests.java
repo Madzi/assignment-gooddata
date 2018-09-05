@@ -8,10 +8,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class SentenceApiApplicationIT {
+class SentenceApiApplicationTests {
 
+    @Test
     @DisplayName("Context must be loaded")
-    @Test void testContextLoads() {
+    void contextLoads() {
     }
 
 }

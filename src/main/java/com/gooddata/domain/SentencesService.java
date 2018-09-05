@@ -1,35 +1,29 @@
 package com.gooddata.domain;
 
-import com.gooddata.domain.model.Sentence;
 import java.util.List;
 import java.util.Optional;
 
+import com.gooddata.domain.model.Sentence;
+
 /**
- * Service for generate / read sentences.
+ * Business layer for sentences.
  */
 public interface SentencesService {
 
     /**
-     * Returns all generated sentences.
+     * Returns all known sentences.
      *
-     * @return list of sentences
+     * @return the list of sentences
      */
-    List<Sentence> getAllSentences();
+    List<Sentence> findAll();
 
-    /**
-     * Returns sentence for specified id.
-     *
-     * @param id the sentence id
-     * @return the sentence
-     */
-    Optional<Sentence> getSentenceById(String id);
+    Optional<Sentence> getSentetenceById(Long id);
 
     /**
      * Generate sentence from known words.
      *
      * @return the sentence
-     * @throws IllegalStateException when sentence can't be generated
      */
-    Sentence generate() throws IllegalStateException;
+    Sentence generate();
 
 }

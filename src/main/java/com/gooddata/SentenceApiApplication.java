@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * Entry point into Spring Boot Application.
+ * Entry point into Spring Boot Application,
  */
 @SpringBootApplication
 @EnableJpaRepositories("com.gooddata.dao")

@@ -1,4 +1,4 @@
 /**
- * Package for DTO models.
+ * Package for domain objects.
  */
 package com.gooddata.domain.model;

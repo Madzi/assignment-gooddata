@@ -1,17 +1,36 @@
 package com.gooddata.dao;
 
-import com.gooddata.dao.model.WordEntity;
-import com.gooddata.domain.model.Category;
+import com.gooddata.domain.model.WordCategory;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
+/**
+ * Repository for words object.
+ */
 public interface WordsRepository extends CrudRepository<WordEntity, Long> {
 
+    /**
+     * Returns all words.
+     *
+     * @return the list of words
+     */
     @Override
     List<WordEntity> findAll();
 
-    List<WordEntity> findByName(String name);
+    /**
+     * Returns all matches for specific word.
+     *
+     * @param Word the word
+     * @return the list of words
+     */
+    List<WordEntity> findByWord(String Word);
 
-    List<WordEntity> findByCategory(Category category);
+    /**
+     * Returns all matches for specific word category.
+     *
+     * @param wordCategory the word category
+     * @return the list of words
+     */
+    List<WordEntity> findByWordCategory(WordCategory wordCategory);
 
 }
