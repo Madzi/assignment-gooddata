@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import static net.javacrumbs.jsonunit.spring.JsonUnitResultMatchers.json;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -56,6 +57,7 @@ class WordsControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(0)))
+                .andExpect(json().isEqualTo("[]"))
                 .andDo(document("words/all-words-missing"))
                 .andReturn();
     }
@@ -79,6 +81,11 @@ class WordsControllerIT {
                 .andExpect(jsonPath("$[0].wordCategory", is("NOUN")))
                 .andExpect(jsonPath("$[1].wordCategory", is("VERB")))
                 .andExpect(jsonPath("$[2].wordCategory", is("ADJECTIVE")))
+                .andExpect(json().isArray())
+                .andExpect(json().node("[0]").isObject())
+                .andExpect(json().node("[1]").isObject())
+                .andExpect(json().node("[2]").isObject())
+                .andExpect(json().node("[0].word").isStringEqualTo("noun"))
                 .andDo(document("words/all-words-ok"))
                 .andReturn();
     }
@@ -132,6 +139,7 @@ class WordsControllerIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.word", is("sun")))
                 .andExpect(jsonPath("$.wordCategory", is("NOUN")))
+                .andExpect(json().isEqualTo("{\"word\":\"sun\",\"wordCategory\":\"NOUN\"}"))
                 .andDo(document("words/add-new-word"))
                 .andReturn();
     }
