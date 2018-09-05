@@ -4,7 +4,9 @@ import com.gooddata.dao.SentenceEntity;
 import com.gooddata.dao.SentencesRepository;
 import com.gooddata.dao.WordEntity;
 import com.gooddata.dao.WordsRepository;
+import com.gooddata.domain.WordsService;
 import com.gooddata.domain.model.WordCategory;
+import com.gooddata.web.dto.WebWord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,9 +38,10 @@ public class SentencesControllerIT {
 
     @Autowired
     private WordsRepository wordsRepository;
-
     @Autowired
     private SentencesRepository sentencesRepository;
+    @Autowired
+    private WordsService wordsService;
 
 
     @BeforeEach
@@ -125,17 +128,15 @@ public class SentencesControllerIT {
     void testGenerationSentences() throws Exception {
         sentencesRepository.deleteAll();
         wordsRepository.deleteAll();
-        var noun1 = registerWord("noun1", WordCategory.NOUN);
-        var noun2 = registerWord("noun2", WordCategory.NOUN);
-        var verb1 = registerWord("verb1", WordCategory.VERB);
-        var verb2 = registerWord("verb2", WordCategory.VERB);
-        var adjective1 = registerWord("adjective1", WordCategory.ADJECTIVE);
-        var adjective2 = registerWord("adjective2", WordCategory.ADJECTIVE);
+        registerWord("noun", WordCategory.NOUN);
+        registerWord("verb", WordCategory.VERB);
+        registerWord("adjective", WordCategory.ADJECTIVE);
 
         mockMvc.perform(RestDocumentationRequestBuilders
                 .post("/sentences/generate"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.text", is("noun verb adjective")))
                 .andDo(document("sentences/generate-ok"))
                 .andReturn();
     }
@@ -154,9 +155,7 @@ public class SentencesControllerIT {
     }
 
     private WordEntity registerWord(final String name, final WordCategory category) {
-        var word = new WordEntity(name, category);
-        wordsRepository.save(word);
-        return word;
+        return (WordEntity) wordsService.addWord(new WebWord(name, category));
     }
 
 }

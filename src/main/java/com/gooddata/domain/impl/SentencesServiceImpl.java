@@ -52,9 +52,9 @@ public class SentencesServiceImpl implements SentencesService {
     @Transactional
     public Sentence generate() {
         var sentence = new SentenceEntity(
-                new WordEntity(wordsServie.randomWordByCategory(WordCategory.NOUN)),
-                new WordEntity(wordsServie.randomWordByCategory(WordCategory.VERB)),
-                new WordEntity(wordsServie.randomWordByCategory(WordCategory.ADJECTIVE))
+                (WordEntity) wordsServie.randomWordByCategory(WordCategory.NOUN),
+                (WordEntity) wordsServie.randomWordByCategory(WordCategory.VERB),
+                (WordEntity) wordsServie.randomWordByCategory(WordCategory.ADJECTIVE)
         );
         sentencesRepository.save(sentence);
         return sentence;
