@@ -1,0 +1,3 @@
+= Sentence generation API
+
+This application is REST web service for generation sentences.

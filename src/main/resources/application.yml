@@ -2,8 +2,43 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active:
+      - development
+
+forbidden:
+  noun: cat,dog
+  verb: run,fly
+  adjective: big,small
+---
+spring:
+  profiles: development
   datasource:
-    url: jdbc:h2:mem:sentences
+    url: jdbc:h2:mem:dev-sentences
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+---
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:h2:mem:test-sentences
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+---
+spring:
+  profiles: production
+  datasource:
+    url: jdbc:h2:mem:prod-sentences
     driverClassName: org.h2.Driver
     username: sa
     password:

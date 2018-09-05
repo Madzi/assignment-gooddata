@@ -1,9 +1,13 @@
 package com.gooddata.domain.impl;
 
+import com.gooddata.dao.SentenceEntity;
+import com.gooddata.dao.WordEntity;
+import com.gooddata.domain.model.WordCategory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +26,38 @@ public class SentencesServiceImpl implements SentencesService {
     private WordsService wordsServie;
 
     @Override
+    @Transactional
     public List<Sentence> findAll() {
-        return Collections.unmodifiableList(sentencesRepository.findAll());
+        var sentences = sentencesRepository.findAll();
+        sentences.forEach(sentenceEntity -> {
+            sentenceEntity.incShowCount();
+            sentencesRepository.save(sentenceEntity);
+        });
+        return Collections.unmodifiableList(sentences);
     }
 
     @Override
-    public Optional<Sentence> getSentetenceById(Long id) {
-        // TODO Auto-generated method stub
-        return null;
+    @Transactional
+    public Optional<Sentence> findById(final Long id) {
+        var optSentence = sentencesRepository.findById(id);
+        if (optSentence.isPresent()) {
+            var sentence = optSentence.get();
+            sentence.incShowCount();
+            sentencesRepository.save(sentence);
+        }
+        return optSentence.map(it -> (Sentence) it);
     }
 
     @Override
+    @Transactional
     public Sentence generate() {
-        // TODO Auto-generated method stub
-        return null;
+        var sentence = new SentenceEntity(
+                new WordEntity(wordsServie.randomWordByCategory(WordCategory.NOUN)),
+                new WordEntity(wordsServie.randomWordByCategory(WordCategory.VERB)),
+                new WordEntity(wordsServie.randomWordByCategory(WordCategory.ADJECTIVE))
+        );
+        sentencesRepository.save(sentence);
+        return sentence;
     }
 
 }

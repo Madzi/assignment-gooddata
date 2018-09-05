@@ -1,72 +1,75 @@
 package com.gooddata.web;
 
+import com.gooddata.dao.SentencesRepository;
+import com.gooddata.dao.WordEntity;
+import com.gooddata.dao.WordsRepository;
+import com.gooddata.domain.model.WordCategory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
-
-import com.gooddata.domain.WordsService;
-import com.gooddata.domain.model.BadWordCategoryException;
-import com.gooddata.domain.model.WordCategory;
-import com.gooddata.web.dto.WebWord;
-
-@ExtendWith(SpringExtension.class)
+@ExtendWith({ SpringExtension.class, RestDocumentationExtension.class })
 @SpringBootTest
 class WordsControllerIT {
 
     private MockMvc mockMvc;
 
-    @MockBean
-    private WordsService wordsService;
+    @Autowired
+    private SentencesRepository sentencesRepository;
+    @Autowired
+    private WordsRepository wordsRepository;
 
     @BeforeEach
-    void setUp(final WebApplicationContext webApplicationContext) {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
+    void setUp(final WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentationContextProvider) {
+        mockMvc = webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentationContextProvider))
+                .build();
+        sentencesRepository.deleteAll();
     }
 
     @Test
     @DisplayName("The list of words can be empty")
     void testGetEmptyWordList() throws Exception {
-        when(wordsService.findAll()).thenReturn(Collections.emptyList());
+        wordsRepository.deleteAll();
 
-        mockMvc.perform(get("/words"))
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .get("/words"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(0)))
+                .andDo(document("words/all-words-missing"))
                 .andReturn();
     }
 
     @Test
     @DisplayName("The all known words must be returned")
     void testGetFullWordList() throws Exception {
-        when(wordsService.findAll()).thenReturn(Arrays.asList(
-                new WebWord("noun", WordCategory.NOUN),
-                new WebWord("verb", WordCategory.VERB),
-                new WebWord("adjective", WordCategory.ADJECTIVE
-        )));
+        wordsRepository.deleteAll();
+        wordsRepository.save(new WordEntity("noun", WordCategory.NOUN));
+        wordsRepository.save(new WordEntity("verb", WordCategory.VERB));
+        wordsRepository.save(new WordEntity("adjective", WordCategory.ADJECTIVE));
 
-        mockMvc.perform(get("/words"))
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .get("/words"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -76,31 +79,38 @@ class WordsControllerIT {
                 .andExpect(jsonPath("$[0].wordCategory", is("NOUN")))
                 .andExpect(jsonPath("$[1].wordCategory", is("VERB")))
                 .andExpect(jsonPath("$[2].wordCategory", is("ADJECTIVE")))
+                .andDo(document("words/all-words-ok"))
                 .andReturn();
     }
 
     @Test
     @DisplayName("Get one word by word name")
     void testOneWordFromList() throws Exception {
-        var webWord = new WebWord("go", WordCategory.NOUN);
-        when(wordsService.getByWord(anyString())).thenReturn(Arrays.asList(webWord));
+        String word = "go";
+        wordsRepository.deleteAll();
+        wordsRepository.save(new WordEntity(word, WordCategory.NOUN));
 
-        mockMvc.perform(get("/words/{wordId}", webWord.getWord()))
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .get("/words/{wordId}", word))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].word", is("go")))
+                .andExpect(jsonPath("$[0].word", is(word)))
                 .andExpect(jsonPath("$[0].wordCategory", is("NOUN")))
+                .andDo(document("words/get-by-id-one"))
                 .andReturn();
     }
 
     @Test
     @DisplayName("Get two words by word name")
     void testFourWordsFromList() throws Exception {
-        when(wordsService.getByWord(anyString()))
-                .thenReturn(Arrays.asList(new WebWord("go", WordCategory.NOUN), new WebWord("go", WordCategory.VERB)));
+        String word = "go";
+        wordsRepository.deleteAll();
+        wordsRepository.save(new WordEntity(word, WordCategory.NOUN));
+        wordsRepository.save(new WordEntity(word, WordCategory.VERB));
 
-        mockMvc.perform(get("/words/{wordId}", "go"))
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .get("/words/{wordId}", "go"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -108,36 +118,48 @@ class WordsControllerIT {
                 .andExpect(jsonPath("$[0].wordCategory", is("NOUN")))
                 .andExpect(jsonPath("$[1].word", is("go")))
                 .andExpect(jsonPath("$[1].wordCategory", is("VERB")))
+                .andDo(document("words/get-ms"))
                 .andReturn();
     }
 
     @Test
     @DisplayName("The new word can be added")
     void testAddNewWord() throws Exception {
-        var payload = new WebWord("sun", WordCategory.NOUN);
-        when(wordsService.addWord(any())).thenReturn(payload);
-
-        mockMvc.perform(post("/words/{wordId}", "sun")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content("{\"wordCategory\":\"NOUN\"}")
-                )
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .post("/words/{wordId}", "sun")
+                .contentType(MediaType.APPLICATION_JSON_UTF8).content("{\"wordCategory\":\"NOUN\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.word", is("sun")))
                 .andExpect(jsonPath("$.wordCategory", is("NOUN")))
+                .andDo(document("words/add-new-word"))
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Try to add forbidden word")
+    void testAddForbiddenWord() throws Exception {
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .post("/words/{wordId}", "cat")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"wordCategory\":\"NOUN\"}"))
+
+                .andExpect(status().isBadRequest())
+                .andDo(document("words/add-forbidden-word"))
                 .andReturn();
     }
 
     @Test
     @DisplayName("When category incorrect the error must be generated")
     void testFailDuringAddNewWord() throws Exception {
-        when(wordsService.addWord(any())).thenThrow(new BadWordCategoryException("Unsupproted type yet."));
-
-        mockMvc.perform(post("/words/{wordId}", "sun")
+        mockMvc.perform(RestDocumentationRequestBuilders
+                        .post("/words/{wordId}", "sun")
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content("{\"wordCategory\":\"UNKNOWN\"}")
                 )
                 .andExpect(status().isBadRequest())
+                .andDo(document("words/must be generated"))
                 .andReturn();
     }
 

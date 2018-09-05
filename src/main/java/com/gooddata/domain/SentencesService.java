@@ -17,7 +17,13 @@ public interface SentencesService {
      */
     List<Sentence> findAll();
 
-    Optional<Sentence> getSentetenceById(Long id);
+    /**
+     * Returns sentence for specified ID.
+     *
+     * @param id the sentence identifier
+     * @return the sentence if it exists
+     */
+    Optional<Sentence> findById(Long id);
 
     /**
      * Generate sentence from known words.

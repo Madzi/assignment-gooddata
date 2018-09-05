@@ -3,11 +3,16 @@ package com.gooddata.domain.impl;
 import com.gooddata.dao.WordEntity;
 import com.gooddata.dao.WordsRepository;
 import com.gooddata.domain.model.WordCategory;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import java.util.ResourceBundle;
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.gooddata.domain.WordsService;
@@ -21,6 +26,13 @@ public class WordsServiceImpl implements WordsService {
 
     private Random random = new Random();
 
+    @Value("#{'${forbidden.noun}'.split(',')}")
+    private List<String> forbiddenNouns;
+    @Value("#{'${forbidden.verb}'.split(',')}")
+    private List<String> forbiddenVerbs;
+    @Value("#{'${forbidden.adjective}'.split(',')}")
+    private List<String> forbiddenAdjectives;
+
     @Override
     public List<Word> findAll() {
         return Collections.unmodifiableList(wordsRepository.findAll());
@@ -32,9 +44,15 @@ public class WordsServiceImpl implements WordsService {
     }
 
     @Override
+    @Transactional
     public Word addWord(final Word word) {
         if (word.getWordCategory() == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unknown word category");
+        }
+        switch (word.getWordCategory()) {
+            case NOUN: if (forbiddenNouns.contains(word.getWord())) { throw new IllegalStateException("Forbidden word detected"); } break;
+            case VERB: if (forbiddenVerbs.contains(word.getWord())) { throw new IllegalStateException("Forbidden word detected"); } break;
+            case ADJECTIVE: if (forbiddenAdjectives.contains(word.getWord())) { throw new IllegalStateException("Forbidden word detected"); } break;
         }
         var entity = new WordEntity(word);
         return wordsRepository.save(entity);
@@ -51,8 +69,7 @@ public class WordsServiceImpl implements WordsService {
         if (suitableWords.isEmpty()) {
             throw new IllegalStateException();
         }
-        var index = suitableWords.size() == 1 ? 0 : random.nextInt() % suitableWords.size();
-        return suitableWords.get(index);
+        return suitableWords.get(random.nextInt(suitableWords.size()));
     }
 
 }
